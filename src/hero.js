@@ -228,12 +228,21 @@
       Backbone.Character.prototype.saveAttributes,
       ["nextState", "velocity", "acceleration", "yVelocity", "yAcceleration"]
     ),
+    
     initialize: function(attributes, options) {
       options || (options = {});
       Backbone.Character.prototype.initialize.apply(this, arguments);
 
       this.input = options.input;
     },
+
+    /**
+     * Se dispara cuando se monta el héroe.
+     *
+     * @listens input[change:[button]]
+     * @fires dirToggled
+     * @fires buttonBToggled,buttonBToggled
+     */
     onAttach: function() {
       if (this.input) {
         this.stopListening(this.input);
@@ -243,29 +252,51 @@
         this.listenTo(this.input, "change:buttonA", this.buttonAToggled);
       }
     },
+
+    /**
+     * Se dispara cuando se remueve del mundo.
+     *
+     * Deja de descuchar los controles.
+     */
     onDetach: function() {
       if (this.input) this.stopListening(this.input);
     },
+
     toggleDirection: function(dirIntent) {
       return this.dirToggled(dirIntent);
     },
+
+    /**
+     * Revisa si debe ignorar los controles.
+     *
+     * Si es dead, hurt, ko ignora el control.
+     *
+     * @return {boolean}
+     */
     ignoreInput: function() {
       if (this.get("ignoreInput") || this.get("dead")) return true;
       var cur = this.getStateInfo();
       if (cur.mov == "ko" || cur.mov == "dead" || cur.mov2 == "hurt") return true;
       return false;
     },
-    // User input toggled in right or left direction.
-    // Can be pressed or depressed
+
+    /**
+     * User input toggled in right or left direction. Can be pressed or depressed
+     *
+     *
+     * @param {string} dirIntent left or right
+     */
     dirToggled: function(dirIntent) {
       if (this.ignoreInput()) return this;
 
+      // solo left y right
       if (dirIntent != "left" && dirIntent != "right")
         throw "Invalid or missing dirIntent. Must be left or right."
 
       var cur = this.getStateInfo(),
           now = _.now(),
           opoIntent = dirIntent == "right" ? "left" : "right",
+          // verifica que esté el botón presionado
           dirPressed = this.input ? this.input[dirIntent+"Pressed"]() : false,
           opoPressed = this.input ? this.input[opoIntent+"Pressed"]() : false,
           run = this.input ? this.input.buttonBPressed() : false,
@@ -313,39 +344,67 @@
 
       return this;
     },
-    // Attack and run
+
+    /**
+     * Botón de atacar y correr, cambia el state.
+     *
+     * @uses Character.getStateInfo
+     * @uses Input.buttonBPressed
+     * @uses Character.buildState
+     * @uses Character.startNewAnimation
+     * @uses endAttack
+     *
+     * @return this
+     */
     buttonBToggled: function() {
       if (this.ignoreInput()) return this;
 
       var cur = this.getStateInfo(),
+          // boolean si está presionado B
           pressed = this.input ? this.input.buttonBPressed() : false;
 
       if (pressed && cur.mov == "walk") {
+        // si está presionado y caminando lo pone a correr
         cur.mov = "run";
         this.set("state",  this.buildState(cur.mov, cur.mov2, cur.dir));
         this.cancelUpdate = true;
       } else if (!pressed && cur.mov == "run") {
+        // si corre y no está presionado lo pone a caminar
         cur.mov = "walk";
         this.set("state",  this.buildState(cur.mov, cur.mov2, cur.dir));
         this.cancelUpdate = true;
       }
 
+      // si no puede atacar retorna
       if (!this.get("canAttack")) return this;
 
       if (pressed && cur.mov2 != "attack") {
+        // presionado y no está atacando
         var nextState = this.get("nextState");
         if (nextState) {
+          // busca la próxima animación y la mezcla con attack en el estado
           var nex = this.getStateInfo(nextState);
           nextState = this.buildState(nex.mov, "attack", nex.dir);
         }
+        // cambia el state
         this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), {nextState: nextState}, this.endAttack);
         this.cancelUpdate = true;
       } else if (!pressed && cur.mov2 == "attack") {
+        // si no está presionado y está atacando
         this.endAttack();
       }
 
       return this;
     },
+
+    /**
+     * Setea el state y nextState sin attack.
+     *
+     * @uses Character.getStateInfo
+     * @uses Character.buildState
+     *
+     * @return this
+     */
     endAttack: function() {
       var cur = this.getStateInfo(),
           attrs = {state: this.buildState(cur.mov, cur.dir)},
@@ -361,7 +420,7 @@
       var cur = this.getStateInfo(),
           opo = dir == "left" ? "right" : "left",
           state = this.buildState("ko", opo);
-      
+
       this.set({
         state: state,
         velocity: this.animations[state].velocity,

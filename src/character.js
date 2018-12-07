@@ -141,12 +141,12 @@
       var cur = this.getStateInfo(),
           dir = options.dir || cur.dir,
           opo = dir == "left" ? "right" : "left";
-      
+
       if (health == 0)
         return this.knockout(options.sprite || null, dir, options.dir2 || null);
-      else if (health < this.previous("health")) 
+      else if (health < this.previous("health"))
         return this.hurt(options.sprite || null, dir, options.dir2 || null);
-      
+
       this.lastAIEvent = _.now();
 
       return this;
@@ -180,7 +180,7 @@
       this._handlingSpriteHit = sprite;
 
       var cur = this.getStateInfo();
-      
+
       if (cur.mov2 == "hurt") return this;
 
       if (dir2 == "attack") {
@@ -195,6 +195,16 @@
       tis._handlingSpriteHit = undefined;
       return this;
     },
+
+    /**
+     * Mezcla state con attrs y lo setea 
+     *
+     * @param {string} state
+     * @param {object} attrs nextState
+     * @param {function} done el callback
+     *
+     * @return this
+     */
     startNewAnimation: function(state, attrs, done) {
       this.lastSequenceChangeTime = _.now();
       this.set(_.extend({
@@ -378,7 +388,7 @@
         attrs.sequenceIndex = this.get("sequenceIndex");
 
       } else {
-        
+
         // Walls and other obstacles
         if (velocity <= 0 && collision) {
           // Turn around if obstacle left
@@ -453,6 +463,12 @@
       this.set({state: this.buildState(cur.mov, cur.mov2, dirIntent)});
       return this;
     },
+
+    /**
+     *
+     * @param {string} state palabras separadas por '-'
+     * @return {object} state, mov | mov, mov2, dir, opo
+     */
     getStateInfo: function(state) {
       var state = state || this.get("state"),
       pieces = state.split("-");
@@ -473,6 +489,18 @@
       var cur = this.getStateInfo();
       return cur.mov2 == "attack";
     },
+
+    /**
+     * Crea el estado que se guardará en el sprite.
+     *
+     * @example buildState('walk', 'left')
+     *
+     * @param {string} piece1 palabra
+     * @param {string} piece2 palabra
+     * @param {string} piece3 palabra
+     *
+     * @return {string} palabras separadas por '-'
+     */
     buildState: function(piece1, piece2, piece3) {
       var state = "";
       if (piece1) state += piece1;
