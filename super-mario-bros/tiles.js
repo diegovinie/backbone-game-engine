@@ -1,14 +1,18 @@
+/**
+ *
+ * Backbone Game Engine - An elementary HTML5 canvas game engine using Backbone.
+ *
+ * Copyright (c) 2014 Martin Drapeau
+ * https://github.com/martindrapeau/backbone-game-engine
+ *
+ * @class Backbone.Tile
+ * @function extendSprite
+ * @class Backbone.AnimatedTile
+ * @class Backbone.Brick
+ * @class Backbone.QuestionBlock
+ */
 (function() {
 
-  /**
-   *
-   * Backbone Game Engine - An elementary HTML5 canvas game engine using Backbone.
-   *
-   * Copyright (c) 2014 Martin Drapeau
-   * https://github.com/martindrapeau/backbone-game-engine
-   *
-   */
-  
   Backbone.Tile = Backbone.Sprite.extend({
     defaults: {
       type: "tile",
@@ -25,8 +29,16 @@
       this.lastSequenceChangeTime = 0;
     }
   });
-
-
+  /**
+   * sirve para crear una clase de cada tipo de terreno
+   *
+   * @param {string} cls clase a extender
+   * @param {string} name nombre de la nueva clase
+   * @param {object} attributes
+   * @param {object} animations
+   *
+   * @return {Backbone.[constructor]} nombre en capitals
+   */
   function extendSprite(cls, name, attributes, animations) {
     var newCls = _.classify(name);
     Backbone[newCls] = Backbone[cls].extend({
@@ -43,6 +55,8 @@
     return Backbone[newCls];
   }
 
+  /********* se asocia cada secuencia (imagen) de terreno con la clase Tile ***/
+
   extendSprite("Tile", "ground", {collision: true}, {idle: {sequences: [0]}});
 
   extendSprite("Tile", "ground2", {collision: true}, {idle: {sequences: [31]}});
@@ -52,15 +66,15 @@
   extendSprite("Tile", "block2", {collision: true}, {idle: {sequences: [29]}});
 
   extendSprite("Tile", "tube1", {collision: true}, {idle: {sequences: [290]}});
-  
+
   extendSprite("Tile", "tube2", {collision: true}, {idle: {sequences: [291]}});
 
   extendSprite("Tile", "tube1-mirror", {collision: true}, {idle: {sequences: [261]}});
-  
+
   extendSprite("Tile", "tube2-mirror", {collision: true}, {idle: {sequences: [262]}});
 
   extendSprite("Tile", "tube1-ug", {collision: true}, {idle: {sequences: [406]}});
-  
+
   extendSprite("Tile", "tube2-ug", {collision: true}, {idle: {sequences: [407]}});
 
   extendSprite("Tile", "bush1", {collision: false}, {idle: {sequences: [240]}});
@@ -94,15 +108,15 @@
   extendSprite("Tile", "block2-ug", {collision: true}, {idle: {sequences: [145]}});
 
   extendSprite("Tile", "tube3", {collision: true}, {idle: {sequences: [319]}});
-  
+
   extendSprite("Tile", "tube4", {collision: true}, {idle: {sequences: [320]}});
 
   extendSprite("Tile", "tube3-mirror", {collision: true}, {idle: {sequences: [232]}});
-  
+
   extendSprite("Tile", "tube4-mirror", {collision: true}, {idle: {sequences: [233]}});
 
   extendSprite("Tile", "tube3-ug", {collision: true}, {idle: {sequences: [435]}});
-  
+
   extendSprite("Tile", "tube4-ug", {collision: true}, {idle: {sequences: [436]}});
 
   extendSprite("Tile", "bush4", {collision: false}, {idle: {sequences: [269]}});
@@ -126,21 +140,21 @@
   extendSprite("Tile", "flag-pole2", {collision: false}, {idle: {sequences: [335]}});
 
   extendSprite("Tile", "tube1-out", {collision: true}, {idle: {sequences: [292]}});
-  
+
   extendSprite("Tile", "tube2-out", {collision: true}, {idle: {sequences: [293]}});
-  
+
   extendSprite("Tile", "tube3-out", {collision: true}, {idle: {sequences: [294]}});
 
   extendSprite("Tile", "tube1-out-mirror", {collision: true}, {idle: {sequences: [234]}});
-  
+
   extendSprite("Tile", "tube2-out-mirror", {collision: true}, {idle: {sequences: [235]}});
-  
+
   extendSprite("Tile", "tube3-out-mirror", {collision: true}, {idle: {sequences: [236]}});
 
   extendSprite("Tile", "tube1-out-ug", {collision: true}, {idle: {sequences: [408]}});
-  
+
   extendSprite("Tile", "tube2-out-ug", {collision: true}, {idle: {sequences: [409]}});
-  
+
   extendSprite("Tile", "tube3-out-ug", {collision: true}, {idle: {sequences: [410]}});
 
   extendSprite("Tile", "brick7-castle", {collision: true}, {idle: {sequences: [42]}});
@@ -164,21 +178,21 @@
   extendSprite("Tile", "lava-bridge", {collision: true}, {idle: {sequences: [148]}});
 
   extendSprite("Tile", "tube4-out", {collision: true}, {idle: {sequences: [321]}});
-  
+
   extendSprite("Tile", "tube5-out", {collision: true}, {idle: {sequences: [322]}});
-  
+
   extendSprite("Tile", "tube6-out", {collision: true}, {idle: {sequences: [323]}});
 
   extendSprite("Tile", "tube4-out-mirror", {collision: true}, {idle: {sequences: [263]}});
-  
+
   extendSprite("Tile", "tube5-out-mirror", {collision: true}, {idle: {sequences: [264]}});
-  
+
   extendSprite("Tile", "tube6-out-mirror", {collision: true}, {idle: {sequences: [265]}});
 
   extendSprite("Tile", "tube4-out-ug", {collision: true}, {idle: {sequences: [437]}});
-  
+
   extendSprite("Tile", "tube5-out-ug", {collision: true}, {idle: {sequences: [438]}});
-  
+
   extendSprite("Tile", "tube6-out-ug", {collision: true}, {idle: {sequences: [439]}});
 
   extendSprite("Tile", "brick-castle", {collision: true}, {idle: {sequences: [11]}});
@@ -196,22 +210,34 @@
   extendSprite("Tile", "railing", {collision: false}, {idle: {sequences: [363]}});
 
   extendSprite("Tile", "platform1", {collision: true}, {idle: {sequences: [237]}});
-  
+
   extendSprite("Tile", "platform2", {collision: true}, {idle: {sequences: [238]}});
-  
+
   extendSprite("Tile", "platform3", {collision: true}, {idle: {sequences: [239]}});
-  
+
   extendSprite("Tile", "platform-pole", {collision: false}, {idle: {sequences: [208]}});
 
 
-  // Subclass Sprite to use a global timer - so all animated
-  // sprites animate in sync.
+  /**
+   * Subclase Sprite que usa el relog para sincronizar animaciones
+   *
+   * @extends Backbone.Tile
+   * @uses Backbone.Clock
+   */
   Backbone.AnimatedTile = Backbone.Tile.extend({
     initialize: function(attributes, options) {
       Backbone.Tile.prototype.initialize.apply(this, arguments);
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
     },
+
+    /**
+     * Empieza a escuchar el reloj
+     *
+     * Si no encuentra el reloj lo crea.
+     * @listens Backbone.Clock[change:ticks]
+     * @fires updateAnimationIndex()
+     */
     onAttach: function() {
       if (!this.engine) return;
       this.onDetach();
@@ -223,13 +249,25 @@
 
       this.listenTo(this.clock, "change:ticks", this.updateAnimationIndex);
     },
+
+    /**
+     * Deja de escuchar el reloj
+     */
     onDetach: function() {
       if (this.clock) this.stopListening(this.clock);
       this.clock = undefined;
     },
+
     update: function(dt) {
       return true;
     },
+
+    /**
+     * Avanza en uno la animación, al final vuelve al inicio.
+     *
+     * Sets sequenceIndex
+     * @uses Sprite.getAnimation()
+     */
     updateAnimationIndex: function() {
       var animation = this.getAnimation(),
           sequenceIndex = this.get("sequenceIndex") || 0;
@@ -238,6 +276,11 @@
     }
   });
 
+  /**
+   * Ladrillo que salta cuando le pegan de abajo.
+   *
+   * @extends Backbone.AnimatedTile
+   */
   Backbone.Brick = Backbone.AnimatedTile.extend({
     defaults: _.extend({}, Backbone.Tile.prototype.defaults, {
       name: "brick",
@@ -263,6 +306,21 @@
       Backbone.AnimatedTile.prototype.initialize.apply(this, arguments);
       this.on("hit", this.hit, this);
     },
+
+    /**
+     * Se activa cuando recibe golpe.
+     *
+     * Si viene de abajo y es un héroe salta cambiando el stado, si viene de
+     * arriba dispara hit para parar la caída.
+     *
+     * @emits hit si el golpe viene de arriba.
+     *
+     * @param {Backbone.Sprite} sprite puede ser un héroe.
+     * @param {string} dir dirección de donde viene el golpe.
+     * @param {string?} dir2 no usado.
+     *
+     * @return this
+     */
     hit: function(sprite, dir, dir2) {
       if (sprite.get("hero") && dir == "bottom") {
         var tile = this;
@@ -278,6 +336,7 @@
     }
   });
 
+  // ver exactamente que hace esto
   var NewTile = extendSprite("Brick", "brick-top");
   animations = NewTile.prototype.animations;
   animations.idle.sequences = [1];
@@ -293,7 +352,9 @@
   animations.idle.sequences = [117];
   _.each(animations.bounce.sequences, function(sequence) {sequence.frame  = 117;});
 
-
+  /**
+   *
+   */
   Backbone.QuestionBlock = Backbone.AnimatedTile.extend({
     defaults: _.extend({}, Backbone.Tile.prototype.defaults, {
       name: "question-block",
@@ -323,6 +384,22 @@
       Backbone.AnimatedTile.prototype.initialize.apply(this, arguments);
       this.on("hit", this.hit, this);
     },
+
+    /**
+     * Se activa cuando recibe golpe.
+     *
+     * Si viene de abajo y es un héroe salta cambiando el stado y creando un
+     * FlyingPennie, si viene de otro lado nada. El estado cambia a bounce y
+     * luego a empty.
+     *
+     * @uses Backbone.FlyingPennie
+     *
+     * @param {Backbone.Sprite} sprite puede ser un héroe.
+     * @param {string} dir dirección de donde viene el golpe.
+     * @param {string?} dir2 no usado.
+     *
+     * @return this
+     */
     hit: function(sprite, dir, dir2) {
       if (!sprite || !sprite.get("hero") || dir != "bottom") return;
       if (this.get("state") != "idle") return;

@@ -1,14 +1,22 @@
+/**
+ *
+ * Backbone Game Engine - An elementary HTML5 canvas game engine using Backbone.
+ *
+ * Copyright (c) 2014 Martin Drapeau
+ * https://github.com/martindrapeau/backbone-game-engine
+ *
+ * @class Backbone.Pennie
+ * @class Backbone.PennieUg
+ * @class Backbone.Lever
+ * @class Backbone.FlyingPennie
+ */
 (function() {
 
   /**
+   * La moneda
    *
-   * Backbone Game Engine - An elementary HTML5 canvas game engine using Backbone.
-   *
-   * Copyright (c) 2014 Martin Drapeau
-   * https://github.com/martindrapeau/backbone-game-engine
-   *
+   * @extends Backbone.AnimatedTile
    */
-   
   Backbone.Pennie = Backbone.AnimatedTile.extend({
     defaults: {
       name: "pennie",
@@ -25,11 +33,32 @@
         delay: 50
       }
     },
+
+    /**
+     * @listens hit,squish
+     * @fires hit()
+     * @param {object} attributes
+     * @param {object} options
+     */
     initialize: function(attributes, options) {
       Backbone.AnimatedTile.prototype.initialize.apply(this, arguments);
       this.on("hit", this.hit, this);
       this.on("squish", this.hit, this);
     },
+
+    /**
+     * Se activa cuando recibe golpe.
+     *
+     * Si viene de un héroe quita la moneda del mundo.
+     *
+     * @emits hit
+     *
+     * @param {Backbone.Sprite} sprite puede ser un héroe.
+     * @param {string} dir dirección de donde viene el golpe. No usado.
+     * @param {string?} dir2 no usado.
+     *
+     * @return this
+     */
     hit: function(sprite, dir, dir2) {
       if (sprite.get("hero")) {
         sprite.trigger("hit", this);
@@ -38,6 +67,9 @@
     }
   });
 
+  /**
+   * Averiguar cual es
+   */
   Backbone.PennieUg = Backbone.Pennie.extend({
     defaults: _.extend(_.deepClone(Backbone.Pennie.prototype.defaults), {
       name: "pennie-ug"
@@ -46,6 +78,9 @@
   });
   Backbone.PennieUg.prototype.animations.idle.sequences = [168, 168, 169, 170, 169, 168];
 
+  /**
+   * Averiguar cual es
+   */
   Backbone.Lever = Backbone.Pennie.extend({
     defaults: _.extend(_.deepClone(Backbone.Pennie.prototype.defaults), {
       name: "lever"
@@ -55,6 +90,11 @@
   });
   Backbone.Lever.prototype.animations.idle.sequences = [55, 55, 56, 57, 56, 55];
 
+  /**
+   * La moneda vuela cuando la sacan de la caja.
+   *
+   * @extends Backbone.Sprite
+   */
 	Backbone.FlyingPennie = Backbone.Sprite.extend({
     defaults: {
       name: "flying-pennie",
@@ -81,11 +121,26 @@
         delay: 50
       }
     },
+
+    /**
+    * @param {object} attributes
+    * @param {object} options world
+     */
     initialize: function(attributes, options) {
       options || (options = {});
       this.world = options.world;
       this.lastSequenceChangeTime = 0;
     },
+
+    /**
+     * Remueve la moneda cuando terminan las animaciones.
+     *
+     * @fires Sprite.update()
+     * @uses Sprite.getAnimation()
+     * @param {integer?} dt no usado.
+     *
+     * @return {boolean} true o false cuando remueve la moneda.
+     */
     update: function(dt) {
       Backbone.Sprite.prototype.update.call(this, arguments);
       var animation = this.getAnimation(),
