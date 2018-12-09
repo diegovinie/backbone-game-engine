@@ -4,7 +4,7 @@ $(window).on("load", function() {
       MOBILE = "onorientationchange" in window ||
         window.navigator.msMaxTouchPoints ||
         window.navigator.isCocoonJS;
-  
+
   var canvas = document.getElementById("foreground"),
       context = canvas.getContext("2d");
 
@@ -23,6 +23,23 @@ $(window).on("load", function() {
     WIDTH: canvas.width
   });
 
+  /**
+   * Controlador principal.
+   *
+   * @extends Backbone.Model
+   *
+   * @uses Backbone.DebugPanel
+   * @uses Backbone.TitleScreenGui
+   * @uses Backbone.Engine
+   *
+   * @listens Engine:play
+   * @listens Engine:nextLevel
+   * @listens keypress.Controller
+   *
+   * @method showTitleScreen
+   * @method play
+   * @method nextLevel
+   */
   Backbone.Controller = Backbone.Model.extend({
     initialize: function(attributes, options) {
       options || (options = {});
@@ -57,6 +74,16 @@ $(window).on("load", function() {
 
       this.showTitleScreen();
     },
+
+    /**
+     * Muestra la ventana título.
+     *
+     * @uses Engine.stop
+     * @uses Engine.reset
+     * @uses Engine.start
+     * @uses DebugPanel.clear
+     * @uses Engine.add
+     */
     showTitleScreen: function() {
       this.engine.stop();
       this.engine.reset();
@@ -71,6 +98,14 @@ $(window).on("load", function() {
       ]);
       this.engine.start();
     },
+
+    /**
+     * Inicia el juego. (incompleta)
+     *
+     * @uses Engine.stop
+     * @uses Engine.reset
+     * @uses DebugPanel.clear
+     */
     play: function() {
       this.engine.stop();
       this.engine.reset();
@@ -78,6 +113,14 @@ $(window).on("load", function() {
 
       // TO DO: start a new game. Set the state and add world, input, etc to engine
     },
+
+    /**
+     * Continua un juego existente. (incompleta)
+     *
+     * @uses Engine.stop
+     * @uses Engine.reset
+     * @uses DebugPanel.clear
+     */
     nextLevel: function() {
       this.engine.stop();
       this.engine.reset();
@@ -86,7 +129,7 @@ $(window).on("load", function() {
       // TO DO: continue an existing game. Reset the state and add world, input, etc to engine
     }
   });
-  
+
   var controller = new Backbone.Controller();
 
   // Expose things as globals - easier to debug

@@ -1,17 +1,26 @@
+/**
+ *
+ * Backbone Game Engine - An elementary HTML5 canvas game engine using Backbone.
+ *
+ * Copyright (c) 2014 Martin Drapeau
+ * https://github.com/martindrapeau/backbone-game-engine
+ *
+ */
 (function() {
 
   /**
+   * Camera class
    *
-   * Backbone Game Engine - An elementary HTML5 canvas game engine using Backbone.
+   * Ensures the hero is always in the viewport.
+   * Properly pans the world.
    *
-   * Copyright (c) 2014 Martin Drapeau
-   * https://github.com/martindrapeau/backbone-game-engine
+   * @extends Backbone.Model
    *
+   * @method setOptions
+   * @method maybePan
+   * @method update
+   * @method draw
    */
-
-  // Camera class
-  // Ensures the hero is always in the viewport.
-  // Properly pans the world.
   Backbone.Camera = Backbone.Model.extend({
     defaults: {
       left: 200,
@@ -22,6 +31,13 @@
     initialize: function(attributes, options) {
       this.setOptions(options || {});
     },
+
+    /**
+     *
+     * @param {object} options se pasa world: world, subject: hero
+     * @listens subject:change:[x,y]
+     * @uses maybePan
+     */
     setOptions: function(options) {
       options || (options = {});
       _.extend(this, options || {});
@@ -30,6 +46,10 @@
       if (this.subject && this.world)
         this.listenTo(this.subject, "change:x change:y", this.maybePan);
     },
+
+    /**
+     * @uses World.toShallowJSON
+     */
     maybePan: function() {
       if (!this.world) return this;
       var w = this.world.toShallowJSON(),
@@ -73,9 +93,17 @@
       if (worldX != w.x ||  worldY != w.y)
         this.world.set({x: worldX, y: worldY});
     },
+
+    /**
+     * @return {boolean} false
+     */
     update: function(dt) {
       return false;
     },
+
+    /**
+     * @return this
+     */
     draw: function(context) {
       return this;
     }

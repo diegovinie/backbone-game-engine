@@ -478,6 +478,14 @@
     isRunning: function() {
       return !!this.timerId;
     },
+
+    /**
+     * Inicia el juego.
+     *
+     * @uses window.requestAnimationFrame
+     * @emits start
+     * @return this
+     */
     start: function() {
       var now = _.now();
       this.lastTime = now;
@@ -489,12 +497,25 @@
       this.trigger("start");
       return this;
     },
+
+    /**
+     * Detiene el juego.
+     *
+     * @uses window.cancelAnimationFrame
+     * @emits stop
+     * @return this
+     */
     stop: function() {
       cancelAnimationFrame(this.timerId);
       this.timerId = null;
       this.trigger("stop");
       return this;
     },
+
+    /**
+     * Ejecuta stop() o start()
+     * @return this
+     */
     toggle: function() {
       if (this.timerId)
         this.stop();
@@ -1143,6 +1164,10 @@
   }
 
   if (!window.requestAnimationFrame)
+
+    /**
+     * @return {integer} timer id
+     */
     window.requestAnimationFrame = function(callback, element) {
       var currTime = _.now();
       var timeToCall = Math.max(0, 16 - (currTime - lastTime));

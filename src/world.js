@@ -779,6 +779,10 @@
     findCollidingAt:function(x, y) {
       return this.findAt(x, y, "tile", null, true);
     },
+
+    /**
+     *
+     */
     add: function(models, options) {
       if (_.isArray(models))
         for (var i = 0; i < models.length; i++) {
@@ -899,6 +903,10 @@
           }, [0]);
       return name + "." + (_.max(numbers) + 1);
     },
+
+    /**
+     * @return {string|integer} 
+     */
     buildId: function(sprite) {
       var attributes = sprite.attributes || sprite;
       if (attributes.type != "tile")

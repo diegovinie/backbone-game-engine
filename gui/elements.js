@@ -1,5 +1,8 @@
 (function() {
-  
+
+  /**
+   * @extends Backbone.Button
+   */
   Backbone.LabelButton = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       x: 400,
@@ -21,6 +24,12 @@
     })
   });
 
+  /**
+   * @extends Backbone.Element
+   *
+   * @method enter
+   * @method exit
+   */
   Backbone.Scene = Backbone.Element.extend({
     defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: 0,
@@ -43,11 +52,21 @@
       this.input = options.input;
       _.bindAll(this, "enter", "exit");
     },
+
+    /**
+     * @uses Element.fadeIn
+     * @return this
+     */
     enter: function() {
       this.set("opacity", 0);
       this.fadeIn();
       return this;
     },
+
+    /**
+     * @uses Element.fadeOut
+     * @return this
+     */
     exit: function() {
       this.set("opacity", 1);
       this.fadeOut();
@@ -55,6 +74,11 @@
     }
   });
 
+  /**
+   * @extends Backbone.Element
+   *
+   * @method show
+   */
   Backbone.Panel = Backbone.Element.extend({
     defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: 160,
@@ -80,6 +104,11 @@
       _.bindAll(this, "show");
       this.set("y", Backbone.HEIGHT);
     },
+
+    /**
+     * @uses Element.moveTo
+     * @return this
+     */
     show: function() {
       this.moveTo(this.get("x"), 100);
       return this;

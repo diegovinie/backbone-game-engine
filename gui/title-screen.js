@@ -1,5 +1,10 @@
 (function() {
 
+  /**
+   * Botón.
+   *
+   * @extends Backbone.Button
+   */
   Backbone.PullOutButton = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       x: -372,
@@ -20,6 +25,13 @@
     })
   });
 
+  /**
+   * Saved.
+   *
+   * @extends Backbone.Element
+   * @method onAttach
+   * @method onDraw
+   */
   Backbone.SavedGame = Backbone.Element.extend({
     defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: 960,
@@ -63,6 +75,13 @@
     }
   });
 
+  /**
+   * Los créditos.
+   *
+   * @extends Backbone.Panel
+   *
+   * @method onDraw
+   */
   Backbone.Credits = Backbone.Panel.extend({
     defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
       text: "",
@@ -118,6 +137,32 @@
     }
   });
 
+  /**
+   * La ventana de título y selección.
+   *
+   * @extends Backbone.Scene
+   *
+   * @uses Backbone.Button
+   * @uses Backbone.LabelButton
+   * @uses Backbone.PullOutButton
+   * @uses Backbone.SavedGame
+   * @uses Backbone.Credits
+   *
+   * @listens PullOutButton:tap
+   * @listens Credits:tap
+   * @listens Engine:tap
+   *
+   * @method postInitialize
+   * @method onAttach
+   * @method onDetach
+   * @method onTouchStart
+   * @method showButtons
+   * @method hideButtons
+   * @method showPanel
+   * @method hidePanel
+   * @method update
+   * @method action
+   */
 	Backbone.TitleScreenGui = Backbone.Scene.extend({
     defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
       img: "#title-screen",
@@ -176,6 +221,14 @@
       this.play.textMetrics = undefined;
       this.showCredits.textMetrics = undefined;
     },
+
+    /**
+     * @extends Scene.onAttach
+     *
+     * @uses Engine.add
+     * @uses postInitialize
+     * @uses showButtons
+     */
     onAttach: function() {
       Backbone.Scene.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
@@ -184,17 +237,48 @@
 
       this.play.set("text", this.saved ? "Continue " : "New Game ");
 
-      this.engine.add([this.banner, this.touchStart, this.loading, this.play, this.showCredits, this.credits, this.savedGame]);
+      this.engine.add([
+        this.banner,
+        this.touchStart,
+        this.loading,
+        this.play,
+        this.showCredits,
+        this.credits,
+        this.savedGame
+      ]);
 
       if (!this.ready)
         setTimeout(this.postInitialize.bind(this), 200);
-      else 
+      else
         setTimeout(this.showButtons.bind(this), 100);
     },
+
+    /**
+     * @extends Scene.onDetach
+     *
+     * @uses Engine.remove
+     */
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
-      this.engine.remove([this.banner, this.touchStart, this.loading, this.play, this.showCredits, this.credits, this.savedGame]);
+      this.engine.remove([
+        this.banner,
+        this.touchStart,
+        this.loading,
+        this.play,
+        this.showCredits,
+        this.credits,
+        this.savedGame
+      ]);
     },
+
+    /**
+     * Es el primer clic en el inicio.
+     *
+     * @uses Element.moveTo
+     * @uses showButtons
+     *
+     * @param {event} e
+     */
     onTouchStart: function(e) {
       // Animate some stuff
       this.banner.moveTo(this.banner.get("x"), 50);
@@ -203,29 +287,75 @@
       this.ready = true;
       this.showButtons();
     },
+
+    /**
+     * Mueve los botones hacia la pantalla.
+     *
+     * @uses Element.moveTo
+     */
     showButtons: function() {
-      this.play.moveTo(-this.play.get("width") + this.play.textMetrics.width + this.play.get("textPadding")*2, this.play.get("y"));
-      this.showCredits.moveTo(-this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2, this.showCredits.get("y"));
+      this.play.moveTo(
+        -this.play.get("width") + this.play.textMetrics.width + this.play.get("textPadding")*2,
+        this.play.get("y")
+      );
+      this.showCredits.moveTo(
+        -this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2,
+        this.showCredits.get("y")
+      );
       if (this.saved)
         this.savedGame.moveTo(720, this.savedGame.get("y"));
     },
+
+    /**
+     * Mueve los botones fuera de la pantalla.
+     *
+     * @uses Element.moveTo
+     */
     hideButtons: function() {
-      this.play.moveTo(-this.play.get("width"), this.play.get("y"));
-      this.showCredits.moveTo(-this.showCredits.get("width"), this.showCredits.get("y"));
+      this.play.moveTo(
+        -this.play.get("width"),
+        this.play.get("y")
+      );
+      this.showCredits.moveTo(
+        -this.showCredits.get("width"),
+        this.showCredits.get("y")
+      );
       this.savedGame.moveTo(960, this.savedGame.get("y"));
     },
+
+    /**
+     * Muestra el panel.
+     *
+     * @uses Element.moveTo
+     * @uses hideButtons
+     *
+     * @listens Engine:tap
+     */
     showPanel: function(panel) {
       this.panel = panel;
       this.panel.moveTo(this.panel.get("x"), 50);
       this.hideButtons();
       this.listenTo(this.engine, "tap", this.hidePanel);
     },
+
+    /**
+     * Oculta el panel.
+     *
+     * @uses Element.moveTo
+     * @uses showButtons
+     */
     hidePanel: function() {
       this.stopListening(this.engine);
       this.panel.moveTo(this.panel.get("x"), Backbone.HEIGHT);
       this.panel = undefined;
       this.showButtons();
     },
+
+    /**
+     * @extends Scene.update
+     *
+     * @return {boolean}
+     */
     update: function(dt) {
       if (!Backbone.Scene.prototype.update.apply(this, arguments)) return false;
 
@@ -242,6 +372,14 @@
 
       return true;
     },
+
+    /**
+     *
+     * @uses hideButtons
+     * @uses Element.fadeOut
+     * @emits event
+     * @param {string} event el evento.
+     */
     action: function(event) {
       if (event == "play") this.loading.set("x", 400);
 

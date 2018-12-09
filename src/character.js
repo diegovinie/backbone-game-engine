@@ -14,6 +14,9 @@
       fallAcceleration = 1200,
       fallVelocity = 600;
 
+  /**
+   * Las animaciones básicas (idle, walk, fall, ko)
+   */
   var animations = {
     "idle-left": {
       sequences: [0],
@@ -87,6 +90,8 @@
         yVelocity: fallVelocity,
         yAcceleration: fallAcceleration
       };
+
+  /* mezcla las animaciones básicas con hurtAnimation */
   animations["idle-hurt-left"] = _.extend({}, animations["idle-left"], hurtAnimation);
   animations["idle-hurt-right"] = _.extend({}, animations["idle-right"], hurtAnimation);
   animations["walk-hurt-left"] = _.extend({}, animations["walk-left"], hurtAnimation);
@@ -94,7 +99,33 @@
   animations["fall-hurt-left"] = _.extend({}, animations["fall-left"], hurtAnimation);
   animations["fall-hurt-right"] = _.extend({}, animations["fall-right"], hurtAnimation);
 
-
+  /**
+   * @extends Backbone.Sprite
+   *
+   * @listens attach
+   * @listens detach
+   * @listens hit
+   * @listens change:health
+   * @listens beforeFall
+   *
+   * @property {object} animations
+   * @method onAttach
+   * @method onDetach
+   * @method onBeforeFall
+   * @method onHealthChange
+   * @method knockout
+   * @method hurt
+   * @method hit
+   * @method startNewAnimation
+   * @method updateSequenceIndex
+   * @method ai
+   * @method update
+   * @method toggleDirection
+   * @method getStateInfo
+   * @method isAttacking
+   * @method buildState
+   * @method buildCollisionMap
+   */
   Backbone.Character = Backbone.Sprite.extend({
     defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
       name: "character",
@@ -197,7 +228,7 @@
     },
 
     /**
-     * Mezcla state con attrs y lo setea 
+     * Mezcla state con attrs y lo setea
      *
      * @param {string} state
      * @param {object} attrs nextState
@@ -484,6 +515,10 @@
       stateInfo.opo = stateInfo.dir == "right" ? "left" : "right";
       return stateInfo;
     },
+
+    /**
+     * @return {boolean} verdadero si tiene attack en el state.
+     */
     isAttacking: function() {
       if (this.cancelUpdate) return false;
       var cur = this.getStateInfo();
