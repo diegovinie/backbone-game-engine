@@ -196,6 +196,24 @@
   animations["skid-hurt-left"] = _.extend({}, animations["skid-left"], hurtAnimation);
   animations["skid-hurt-right"] = _.extend({}, animations["skid-right"], hurtAnimation);
 
+  /**
+   * @extends Backbone.Character
+   *
+   * @method onAttach
+   * @method onDetach
+   * @method toggleDirection
+   * @method ignoreInput
+   * @method dirToggled
+   * @method buttonBToggled
+   * @method endAttack
+   * @method knockout
+   * @method hurt
+   * @method isAttacking
+   * @method hit
+   * @method buttonAToggled
+   * @method sequenceDelay
+   * @method update
+   */
   Backbone.Hero = Backbone.Character.extend({
     defaults: _.extend({}, Backbone.Character.prototype.defaults, {
       name: "hero",
@@ -228,7 +246,7 @@
       Backbone.Character.prototype.saveAttributes,
       ["nextState", "velocity", "acceleration", "yVelocity", "yAcceleration"]
     ),
-    
+
     initialize: function(attributes, options) {
       options || (options = {});
       Backbone.Character.prototype.initialize.apply(this, arguments);
@@ -415,6 +433,18 @@
       this.set(attrs);
       return this;
     },
+
+    /**
+     * Mata al héroe, actualiza el state.
+     *
+     * @uses Character.getStateInfo
+     * @uses Character.buildState
+     *
+     * @param {Backbone.Sprite?} sprite no usada.
+     * @param {string} dir la dirección del golpe.
+     *
+     * @return this
+     */
     knockout: function(sprite, dir) {
       dir || (dir = cur.dir);
       var cur = this.getStateInfo(),
@@ -432,6 +462,17 @@
       this.cancelUpdate = true;
       return this;
     },
+
+    /**
+     * Construye la animación hut en el state.
+     *
+     * @uses Character.buildState
+     *
+     * @param {Backbone.Sprite} sprite no usada.
+     * @param {string} dir la dirección del golpe.
+     *
+     * @return this
+     */
     hurt: function(sprite, dir) {
       this.set({
         state: this.buildState("jump", "hurt", dir == "left" ? "right" : "left"),
@@ -442,9 +483,30 @@
       });
       return this;
     },
+
+    /**
+     * @return {boolean} si attack está en el state.
+     */
     isAttacking: function() {
       return this.attributes.state.indexOf("-attack") > 0;
     },
+
+    /**
+     * Maneja un golpe.
+     *
+     * Si el golpe es un artifact, si es un enemigo revisa si el héroe está
+     * atancando y si es atacado. Cambia las monedas, la vida.
+     *
+     * @uses Character.getStateInfo
+     * @uses isAttacking
+     * @emits hit
+
+     * @param {Backbone.Sprite} sprite el que golpea
+     * @param {string} dir
+     * @param {string} dir2
+     *
+     * @return this
+     */
     hit: function(sprite, dir, dir2) {
       if (this._handlingSpriteHit) return this;
       this._handlingSpriteHit = sprite;
@@ -454,8 +516,10 @@
 
       if (type == "artifact") {
         switch (sprite.get("name")) {
+          // se pueden definir más casos de artefactos
           case "a-coin":
             this.cancelUpdate = true;
+            // aumenta el contador de monedas
             this.set("coins", this.get("coins") + 1);
             break;
         }
@@ -465,8 +529,18 @@
         } else {
           if (sprite.isAttacking()) {
             this.cancelUpdate = true;
+            // cuanto daño hace el enemigo
             var attackDamage = sprite.get("attackDamage") || 1;
-            this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+            this.set(
+              {
+                health: Math.max(this.get("health") - attackDamage, 0)
+              },
+              {
+                sprite: sprite,
+                dir: dir,
+                dir2: dir2
+              }
+            );
           }
         }
       }
@@ -474,7 +548,21 @@
       this._handlingSpriteHit = undefined;
       return this;
     },
-    // Jump
+
+    /**
+     * El salto. Cambia state nextState.
+     *
+     * si encuentra arriba un obstáculo con colisión lo hace rebotar.
+     *
+     * @uses ignoreInput
+     * @uses Character.getStateInfo
+     * @uses Input.buttonAPressed
+     * @uses Character.buildState
+     * @uses Sprite.getAnimation
+     * @uses World.height
+
+     * @return this
+     */
     buttonAToggled: function() {
       if (this.ignoreInput()) return this;
 
@@ -482,6 +570,7 @@
           cur = this.getStateInfo(),
           attrs = {};
 
+      // comienzo del salto
       if (this.input && this.input.buttonAPressed() && cur.mov != "jump") {
         // Set new state (keep old as next)
         attrs.state = this.buildState("jump", cur.mov2, cur.dir);
@@ -492,17 +581,25 @@
             velocity = this.get("velocity"),
             walkVelocity = this.getAnimation("walk-right").velocity,
             runVelocity = this.getAnimation("run-right").velocity,
+            // es el cociente entre la vel actual y la de carrera
             ratio = Math.abs((Math.abs(velocity) > walkVelocity ? velocity : walkVelocity) / runVelocity);
+        // determina la vel vertical
         attrs.yVelocity = Math.round(jumpAnimation.yStartVelocity * (ratio + (1-ratio)/2));
 
         var heroWidth = this.get("width"),
             tileHeight = this.get("height"),
+            // el tamaño del tile menos los padding
             heroHeight = tileHeight - this.get("paddingTop") - this.get("paddingBottom"),
             heroBottomY = Math.round(this.get("y") - 4) + tileHeight - this.get("paddingBottom"),
             heroTopY = heroBottomY - heroHeight,
             heroLeftX = this.get("x"),
-            topLeftTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroTopY, "tile", this, true) : null,
-            topRightTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroTopY, "tile", this, true) : null;
+            topLeftTile = heroTopY > 0 ?
+              this.world.findAt(heroLeftX + heroWidth*0.4, heroTopY, "tile", this, true)
+              : null,
+            topRightTile = heroTopY > 0 ?
+              this.world.findAt(heroLeftX + heroWidth*0.6, heroTopY, "tile", this, true)
+              : null;
+        // esto hace rebotar verticalmente al héroe
         if (topLeftTile || topRightTile) attrs.yVelocity = -2*60;
 
         // Keep the horizontal velocity
@@ -512,6 +609,14 @@
 
       return this;
     },
+
+    /**
+     * Devuelve la demora relativa a la velocidad.
+     *
+     * @param {object} animation la animación: sequence, velocity...
+     *
+     * @return {Number}
+     */
     sequenceDelay: function(animation) {
       var velocity = this.get("velocity");
       return animation.velocity && velocity ?

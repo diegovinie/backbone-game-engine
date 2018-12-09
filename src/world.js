@@ -36,7 +36,7 @@
       this.input = options.input;
       this.camera = options.camera;
       this.debugPanel = options.debugPanel;
-      
+
       _.bindAll(this,
         "wrapTime",
         "save", "getWorldIndex", "getWorldCol", "getWorldRow", "cloneAtPosition",
@@ -577,12 +577,20 @@
         dynamicDrawn: count,
         dynamicDrawTime: _.now()-start
       });
-      
+
       return this;
     },
 
-    // Sprites are ided (and ordered) by columns. This allows for
-    // fast column drawing without lookup.
+    /**
+     * Devuelve el id del objeto en el mundo.
+     *
+     * Sprites are ided (and ordered) by columns. This allows for
+     * fast column drawing without lookup.
+     *
+     * @param {object} object
+     *
+     * @return {null|integer} el id
+     */
     getWorldIndex: function(object) {
       if (!_.isObject(object)) return null;
       var x = object.attributes ? (object.get("x") + object.get("width")/2) : (object.x || 0),
@@ -603,12 +611,49 @@
     getWorldRow: function(y) {
       return Math.floor(y / this.get("tileHeight"));
     },
+
+    /**
+     * Devuelve un sprite buscado según posición y tipo.
+     *
+     * @param {} x
+     * @param {} y
+     * @param {} type
+     * @param {} exclude
+     * @param {} collision
+     *
+     * @return {_findOrFilter}
+     */
     findAt: function(x, y, type, exclude, collision) {
       return this._findOrFilter("find", x, y, type, exclude, collision);
     },
+
+    /**
+     * Devuelve un array de sprites buscados según posición y tipo.
+     *
+     * @param {} x
+     * @param {} y
+     * @param {} type
+     * @param {} exclude
+     * @param {} collision
+     *
+     * @return {_findOrFilter}
+     */
     filterAt: function(x, y, type, exclude, collision) {
       return this._findOrFilter("filter", x, y, type, exclude, collision);
     },
+
+    /**
+     * Devuelve sprite o array de sprites buscados según posición y tipo.
+     *
+     * @param {string} fn find or filter
+     * @param {integer} x
+     * @param {integer} y
+     * @param {string} type tile
+     * @param {Backbone.Character} exclude
+     * @param {boolean} collision
+     *
+     * @return {Backbone.Sprite|array[Backbone.Sprite]|null}
+     */
     _findOrFilter: function(fn, x, y, type, exclude, collision) {
       var id = exclude && exclude.id ? exclude.id : null,
           col = this.getWorldCol(x),
@@ -616,10 +661,20 @@
           index, c, r, s,
           result = [];
 
+      /**
+       * Verifica si es el sprite buscado.
+       *
+       * @param {Backbone.Sprite} sprite
+       * @return {boolean}
+       */
       function test(sprite) {
+        // existe el sprite y es dif del excluído
         return (sprite && sprite.id && sprite.id != id) &&
+          // el sprite tiene el mismo tipo
           (!type || sprite.get("type") == type) &&
+          // la colision coincide con la del sprite
           (collision === undefined || sprite.attributes.collision === collision) &&
+          // si el punto coincide con el sprite
           sprite.overlaps.call(sprite, x, y);
       }
 
@@ -786,7 +841,7 @@
         this.sprites.remove(existing);
         return null;
       }
-      
+
       if (existing) {
         if (spriteName == existingName) {
           if (!existing.getStateInfo) {
