@@ -387,7 +387,19 @@
       return this;
     },
 
+    /**
+     * @var {object[expires,callback]} timeouts el registro de los timeout
+     */
     timeouts: {},
+
+    /**
+     * Agrega un timeout al registro.
+     *
+     * @param {function} callback
+     * @param {integer} delay miliseconds
+     *
+     * @return {string} timerId
+     */
     setTimeout: function(callback, delay) {
       var timerId = _.uniqueId();
       this.timeouts[timerId] = {
@@ -396,10 +408,20 @@
       };
       return timerId;
     },
+
+    /**
+     * Elimina un timeout del registro.
+     *
+     * @param {string} timerId
+     */
     clearTimeout: function(timerId) {
       if (this.timeouts[timerId] != undefined)
         delete this.timeouts[timerId];
     },
+
+    /**
+     * Revisa los timeout y ejecuta el callback de los vencidos.
+     */
     handleTimeouts: function() {
       var now = Date.now(),
           timerIds = _.keys(this.timeouts),
@@ -407,6 +429,7 @@
       for (var i=0; i<timerIds.length; i++) {
         timerId = timerIds[i];
         timeout = this.timeouts[timerId];
+        // si se venció el tiempo ejecuta el callback
         if (now > timeout.expires) {
           timeout.callback();
           delete this.timeouts[timerId];
@@ -905,7 +928,7 @@
     },
 
     /**
-     * @return {string|integer} 
+     * @return {string|integer}
      */
     buildId: function(sprite) {
       var attributes = sprite.attributes || sprite;

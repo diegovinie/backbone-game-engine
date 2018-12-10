@@ -8,11 +8,20 @@
    * https://github.com/martindrapeau/backbone-game-engine
    *
    */
-   
+
   var sequenceDelay = 300,
       animations;
 
-  // Mushroom is the base enemie class.
+  /**
+   * Mushroom is the base enemie class.
+   *
+   * @extends Backbone.Character
+   *
+   * @method ai
+   * @method isAttacking
+   * @method squish
+   * @method hit
+   */
   Backbone.Mushroom = Backbone.Character.extend({
     defaults: _.extend(_.deepClone(Backbone.Character.prototype.defaults), {
       name: "mushroom",
@@ -41,16 +50,52 @@
         scaleY: 1
       }
     }),
+
+    /**
+     * Investigar
+     *
+     * @uses Character.getStateInfo
+     *
+     * @param {integer} dt no usado.
+     *
+     * @return this
+     */
     ai: function(dt) {
       var cur = this.getStateInfo();
+      // si el personaje está siendo barrido y no hay colisión
       if (cur.mov == "squished" && !this.get("collision")) this.cancelUpdate = true;
       return this;
     },
+
+    /**
+     * Verifica si está atacando.
+     *
+     * @uses Character.getStateInfo
+     *
+     * @param {Backbone.Sprite} sprite no usado.
+     * @param {string} dir no usado.
+     * @param {string} dir2 no usado.
+     *
+     * @return {boolean}
+     */
     isAttacking: function(sprite, dir, dir2) {
       if (this.cancelUpdate) return false;
       var cur = this.getStateInfo();
+      // verdadedo si camina o esta quieto
       return (cur.mov == "walk" || cur.mov == "idle");
     },
+
+    /**
+     * Remueve del mundo al personaje cuando es aplastado.
+     *
+     * @uses Character.getStateInfo
+     * @uses Character.buildState
+     * @uses World.setTimeout
+     *
+     * @param {Backbone.Sprite} sprite
+     *
+     * @return this
+     */
     squish: function(sprite) {
       var self = this,
           cur = this.getStateInfo();
@@ -58,12 +103,30 @@
         state: this.buildState("squished", cur.dir),
         collision: false
       });
+
+      // si aún existe luego del tiempo remueve al personaje
       this.world.setTimeout(function() {
         if (self && self.world) self.world.remove(self);
       }, 2000);
       this.cancelUpdate = true;
       return this;
     },
+
+    /**
+     * Maneja el golpe que recibe el personaje.
+     *
+     * @uses Character.getStateInfo
+     * @uses squish
+     * @uses Character.knockout
+     *
+     * @emits Backbone.Sprite:hit
+     *
+     * @param {Backbone.Sprite} sprite el atacante.
+     * @param {string} dir dirección de donde viene el golpe.
+     * @param {string} dir2 no usada.
+     *
+     * @return this
+     */
     hit: function(sprite, dir, dir2) {
       if (this._handlingSpriteHit) return this;
       this._handlingSpriteHit = sprite;
@@ -71,13 +134,21 @@
       var cur = this.getStateInfo(),
           opo = dir == "left" ? "right" : (dir == "right" ? "left" : (dir == "top" ? "bottom" : "top"));
 
+      // si es héroe
       if (sprite.get("hero")) {
+        // golpe viene de arriba
         if (dir == "top")
-          this.squish.apply(this, arguments);
-      } else if (sprite.get("state").indexOf("slide") != -1 ||
-                sprite.get("type") == "tile" && dir == "bottom" && sprite.get("state") == "bounce") {
+          this.squish.apply(this, arguments); // mata al personaje aplastando
+      } else if (sprite.get("state").indexOf("slide") != -1
+                // el atacante se está deslizando (caparazón)
+                || sprite.get("type") == "tile"
+                // ó es un tile saltando y viene de abajo (ladrillo golpeado)
+                && dir == "bottom"
+                && sprite.get("state") == "bounce") {
+        // mata directamente
         this.knockout.apply(this, arguments);
       }
+      // el oponente recibe golpe en la dirección opuesta
       sprite.trigger("hit", this, opo);
 
       this._handlingSpriteHit = undefined;
@@ -85,6 +156,15 @@
     }
   });
 
+  /**
+   * @extends Backbone.Mushroom
+   *
+   * @method isAttacking
+   * @method slide
+   * @method squish
+   * @method hit
+   * @method wake
+   */
   Backbone.Turtle = Backbone.Mushroom.extend({
     defaults: _.extend(_.deepClone(Backbone.Mushroom.prototype.defaults), {
       name: "turtle"
@@ -161,12 +241,19 @@
       return this;
     }
   });
+
+  /* Agregar las anumaciones a Turtle [6, 7, 10, 11] */
   animations = Backbone.Turtle.prototype.animations;
-  animations["idle-left"].sequences = animations["idle-right"].sequences =
-    animations["fall-left"].sequences = animations["fall-right"].sequences =
-    animations["ko-left"].sequences = animations["ko-right"].sequences = [6];
+  animations["idle-left"].sequences = animations["idle-right"].sequences
+                                    = animations["fall-left"].sequences
+                                    = animations["fall-right"].sequences
+                                    = animations["ko-left"].sequences
+                                    = animations["ko-right"].sequences = [6];
+
   animations["walk-left"].sequences = animations["walk-right"].sequences = [6, 7];
+  // aplastada queda caparazón
   animations["squished-left"].sequences = animations["squished-right"].sequences = [10];
+  // extiende a wake y fall cuando es sólo caparazón
   _.extend(animations, {
     "wake-left": {
       sequences: [10, 11],
@@ -293,8 +380,8 @@
     animations["ko-left"].sequences = animations["ko-right"].sequences = [33];
   animations["walk-left"].sequences = animations["walk-right"].sequences = [33, 32];
   animations["squished-left"].sequences = animations["squished-right"].sequences =
-    animations["walk-slide-left"].sequences = animations["walk-slide-right"].sequences = 
-    animations["fall-slide-left"].sequences = animations["fall-slide-right"].sequences = 
+    animations["walk-slide-left"].sequences = animations["walk-slide-right"].sequences =
+    animations["fall-slide-left"].sequences = animations["fall-slide-right"].sequences =
     animations["wake-left"].sequences = animations["wake-right"].sequences = [34];
 
   Backbone.Spike = Backbone.Mushroom.extend({

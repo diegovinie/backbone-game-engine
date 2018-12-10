@@ -16,6 +16,11 @@
    * La moneda
    *
    * @extends Backbone.AnimatedTile
+   *
+   * @listens hit
+   * @listens squish
+   *
+   * @method hit
    */
   Backbone.Pennie = Backbone.AnimatedTile.extend({
     defaults: {
@@ -94,6 +99,8 @@
    * La moneda vuela cuando la sacan de la caja.
    *
    * @extends Backbone.Sprite
+   *
+   * @method update
    */
 	Backbone.FlyingPennie = Backbone.Sprite.extend({
     defaults: {
