@@ -69,6 +69,13 @@ $(window).on("load", function() {
         })
       });
 
+      Backbone.Nina = Backbone.Hero.extend({
+        defaults: _.extend({}, Backbone.Hero.prototype.defaults, {
+          name: "nina",
+          spriteSheet: "nina"
+        })
+      });
+
       var spriteSheets = new Backbone.SpriteSheetCollection([{
         id: "mario",
         img: "#mario",
@@ -83,7 +90,15 @@ $(window).on("load", function() {
         tileHeight: 32,
         tileColumns: 29,
         tileRows: 28
-      }
+      },
+      // {
+      //   id: 'nina',
+      //   img: '#nina',
+      //   tileWidth: 32,
+      //   tileHeight: 64,
+      //   tileColumns: 5,
+      //   tileRows: 1
+      // }
     ]).attachToSpriteClasses();
 
       this.input = new Backbone.Input({
@@ -98,6 +113,12 @@ $(window).on("load", function() {
       }, {
         input: this.input
       });
+
+      // this.nina = new Backbone.Nina({
+      //   x: 400, y: 200, floor: 500
+      // }, {
+      //   input: this.input
+      // })
 
       this.world = new Backbone.World(
         window._world
