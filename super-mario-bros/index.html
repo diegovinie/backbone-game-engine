@@ -28,6 +28,7 @@
         <script src="../src/local-storage.js" type="text/javascript"></script>
         <script src="../src/camera.js" type="text/javascript"></script>
         <script src="../src/editor.js" type="text/javascript"></script>
+        <script src="../src/audio.js" charset="utf-8"></script>
 
         <script src="mario.js" type="text/javascript"></script>
         <script src="tiles.js" type="text/javascript"></script>
@@ -52,6 +53,10 @@
     </head>
 
     <body>
+        <audio src="assets/jump.mp3" class="game" data-name="jump" style="display: none;"></audio>
+        <audio src="assets/ding.mp3" class="game" data-name="ding" style="display: none;"></audio>
+        <audio src="assets/loop.mp3" class="game" data-name="bg" data-persist="true" loop style="display: none;"></audio>
+
         <img id="mario" src="super-mario-2x.png" style="display:none;" />
         <img id="tiles" src="super-mario-tiles-2x.png" style="display:none;" />
         <img id="enemies" src="super-mario-enemies-2x.png" style="display:none;" />

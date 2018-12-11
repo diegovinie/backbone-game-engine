@@ -408,6 +408,8 @@
       this.set({state: "bounce", sequenceIndex: 0});
 
       if (this.world)
+        // sonido al comer una moneda
+        this.engine.audios.trigger('play', 'ding');
         this.world.add(new Backbone.FlyingPennie({
           x: this.get("x"),
           y: this.get("y")

@@ -67,6 +67,8 @@
     hit: function(sprite, dir, dir2) {
       if (sprite.get("hero")) {
         sprite.trigger("hit", this);
+        // sonido al comer una moneda
+        this.engine.audios.trigger('play', 'ding');
         _.defer(this.world.remove, this);
       }
     }

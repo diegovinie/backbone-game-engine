@@ -53,6 +53,12 @@ $(window).on("load", function() {
 
       _.bindAll(this, "onChangeState", "toggleState", "saveWorld", "loadWorld");
 
+      var audioNodes = document.querySelectorAll('audio.game');
+      var audioElements = Array.from(audioNodes);
+
+      var audios = new Backbone.AudioCollection(audioElements);
+      console.log(audios);
+
       /*
        * Crea los sprite sheets y los amarra a las clases sprite existentes. El
        * parámetro es un array donde buscar las imágenes. Luego llama a
@@ -99,7 +105,8 @@ $(window).on("load", function() {
       this.world = new Backbone.World(
         _.extend({viewportBottom: 156}, window._world), {
         input: this.input,
-        camera: this.camera
+        camera: this.camera,
+        audios: audios
       });
 
       this.display = new Backbone.Display({}, {
@@ -139,7 +146,8 @@ $(window).on("load", function() {
       // The game engine
       this.engine = new Backbone.Engine({}, {
         canvas: canvas,
-        debugPanel: this.debugPanel
+        debugPanel: this.debugPanel,
+        audios: audios
       });
       this.engine.add(_.compact([
         this.world,

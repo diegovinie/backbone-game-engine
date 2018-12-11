@@ -12,6 +12,9 @@
 
   /**
    * @extends Backbone.Hero
+   *
+   * @method bounce
+   * @method hit
    */
   Backbone.Mario = Backbone.Hero.extend({
     defaults: _.extend({}, Backbone.Hero.prototype.defaults, {
