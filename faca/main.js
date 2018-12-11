@@ -1,5 +1,24 @@
 $(window).on("load", function() {
 
+  function playSounds () {
+    var audioElements = document.querySelectorAll('audio.game');
+
+    // var audios = Array.from(audioElements).map(function (el) {
+    //   return {
+    //     name: el.id.split('-')[0],
+    //     src: el.src
+    //   };
+    // });
+
+    var audios = {};
+
+    audioElements.forEach(function (el) {
+      audios[el.id.split('-')[0]] = el.src;
+    })
+    return audios;
+  }
+
+
   var NATIVE = navigator.isCocoonJS,
       MOBILE = "onorientationchange" in window ||
         window.navigator.msMaxTouchPoints ||
@@ -132,6 +151,11 @@ $(window).on("load", function() {
         input: this.input
       });
 
+      var audioNodes = document.querySelectorAll('audio.game');
+      var audioElements = Array.from(audioNodes);
+
+      this.audios = new Backbone.AudioCollection(audioElements);
+
       this.world.add(this.mario);
 
       this.debugPanel = new Backbone.DebugPanel({}, {color: "#fff"});
@@ -149,7 +173,8 @@ $(window).on("load", function() {
       // The game engine
       this.engine = new Backbone.Engine({}, {
         canvas: canvas,
-        debugPanel: this.debugPanel
+        debugPanel: this.debugPanel,
+        audios: this.audios
       });
 
       // Controls
