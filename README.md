@@ -8,5 +8,9 @@ http://martindrapeau.github.io/backbone-game-engine
 
 * * *
 
+## Stable
+
+Estos son los archivos esenciales.
+
 Copyright (c) Martin Drapeau<br/>
 Licensed under the MIT @license
