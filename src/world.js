@@ -36,6 +36,7 @@
       this.input = options.input;
       this.camera = options.camera;
       this.debugPanel = options.debugPanel;
+      this.audios = options.audios || new Backbone.Collection();
 
       _.bindAll(this,
         "wrapTime",
@@ -123,10 +124,12 @@
           now = _.now();
 
       if (state == "pause") {
+        this.audios.trigger('pause', 'bg');
         this.accumTime += (now - (this.startTime || now));
         this.set("time", this.accumTime);
         if (this.attributes.time) this.reportTimes();
       } else if (state == "play") {
+        this.audios.trigger('play', 'bg');
         this.startTime = now;
       }
     },

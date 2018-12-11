@@ -349,6 +349,7 @@
       this.input = options.input;
       this.canvas = options.canvas;
       this.debugPanel = options.debugPanel;
+      this.audios = options.audios || new Backbone.Collection();
 
       _.bindAll(this,
         "add", "remove", "start", "stop", "toggle", "onAnimationFrame",

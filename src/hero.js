@@ -605,7 +605,10 @@
         // Keep the horizontal velocity
         jumpAnimation.minY = (this.get("y") - this.world.height()) * ratio;
       }
-      if (!_.isEmpty(attrs)) this.set(attrs);
+      if (!_.isEmpty(attrs)) {
+        this.set(attrs);
+        this.engine.audios.trigger('play', 'jump');
+      }
 
       return this;
     },
