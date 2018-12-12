@@ -223,7 +223,7 @@
         this.set("state", this.buildState(cur.mov, cur.opo));
       }
 
-      tis._handlingSpriteHit = undefined;
+      this._handlingSpriteHit = undefined;
       return this;
     },
 
