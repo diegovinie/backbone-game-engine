@@ -323,8 +323,10 @@
           newSprite.trigger("attach");
         }
 
-        if (newSprite.get("hero"))
+        if (newSprite.get("hero")) {
+          console.log('nuevo heroe');
           world.camera.setOptions({world: world, subject: newSprite});
+        }
       });
 
       this.requestBackgroundRedraw = true;

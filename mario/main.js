@@ -19,6 +19,7 @@ $(window).on("load", function() {
   });
 
   var canvas = document.getElementById("foreground");
+  var context = canvas.getContext('2d');
   adjustViewport(canvas);
 
   var spriteSheets = new Backbone.SpriteSheetCollection([{
