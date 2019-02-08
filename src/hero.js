@@ -9,7 +9,7 @@
       runAcceleration = 400,
       releaseDeceleration = 200,
       skidDeceleration = 400,
-      jumpVelocity = 650,
+      jumpVelocity = 480, // prev 650
       jumpDeceleration = 1400,
       jumpHoldDeceleration = 900,
       fallAcceleration = 1200,

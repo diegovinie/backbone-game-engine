@@ -323,8 +323,12 @@
           newSprite.trigger("attach");
         }
 
-        if (newSprite.get("hero"))
+        if (newSprite.get("hero")) {
+            world.trigger('newHero', newSprite);
           world.camera.setOptions({world: world, subject: newSprite});
+
+        }
+
       });
 
       this.requestBackgroundRedraw = true;
@@ -906,6 +910,8 @@
       // A hero is a singleton
       var isHero = newSprite.get("hero");
       if (isHero) {
+        // avisa al controlador de un nuevo heroe
+        this.trigger('newHero', newSprite);
         var oldHeros = this.sprites.where({hero: true});
         if (oldHeros.length) this.sprites.remove(oldHeros);
       }

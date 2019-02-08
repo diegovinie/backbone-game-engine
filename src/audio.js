@@ -31,7 +31,10 @@
      */
     play: function () {
       var audio = new Audio(this.get('src'));
-      if (this.get('loop')) audio.loop = true;
+      if (this.get('loop')) {
+        audio.loop = true;
+        audio.volume = 0.5;
+      }
       audio.play();
 
       return audio;
